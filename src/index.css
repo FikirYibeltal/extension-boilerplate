@@ -1,0 +1,10 @@
+#eid-search-list{
+    position: fixed;
+  right: 0;
+  top: 0;
+  width: 400px;
+  height: 50vh;
+  background: #ffffff;
+  border-right: 1px solid #c2c2c2;
+  z-index: 999;
+  }
