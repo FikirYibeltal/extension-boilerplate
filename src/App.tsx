@@ -78,21 +78,22 @@ const updateOnTable = (document: Document, allNativePayloads: any[], type: any) 
 function App() {
   const [nativePayloads, setNativePayloads] = useState([]);
 
+  const handleUpdate = () => {
+    if (localStorage.getItem("decompress") === "true") {
+      const allNativePayloads: any = [];
+      updateOnAccordion(document, allNativePayloads,'nativePayload');
+      updateOnTable(document, allNativePayloads,'nativePayload');
+      updateOnAccordion(document, allNativePayloads,'responsePayload');
+      updateOnTable(document, allNativePayloads,'responsePayload');
+      setNativePayloads(allNativePayloads);
+    }
+  };
   useEffect(() => {
-    const handleScroll = () => {
-      if (localStorage.getItem("decompress") === "true") {
-        const allNativePayloads: any = [];
-        updateOnAccordion(document, allNativePayloads,'nativePayload');
-        updateOnTable(document, allNativePayloads,'nativePayload');
-        updateOnAccordion(document, allNativePayloads,'responsePayload');
-        updateOnTable(document, allNativePayloads,'responsePayload');
-        setNativePayloads(allNativePayloads);
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
+    
+    window.addEventListener("scroll", handleUpdate);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scroll", handleUpdate);
     };
   }, []);
 
@@ -101,7 +102,7 @@ function App() {
       if (message.action === 'setLocalStorage') {
         const { key, value } = message.data;
         localStorage.setItem(key, value);
-        console.log(`Set local storage for key: ${key} with value: ${value}`);
+        if(value==='true') handleUpdate()
       }else if(message.action==='clear'){
         localStorage.setItem('decompress','false');
         const paragraphsToRemove = document.querySelectorAll('p.zlib-decompressed-text');
