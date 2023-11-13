@@ -6,7 +6,7 @@ import reportWebVitals from './reportWebVitals';
 
 
 const rootElement = document.createElement("div");
-rootElement.id = "eid-search-list";
+rootElement.id = "zlib-decompressor";
 document.body.appendChild(rootElement);
 const root = ReactDOM.createRoot(rootElement);
 root.render(

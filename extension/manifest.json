@@ -1,7 +1,10 @@
 {
-    "name": "EID",
+    "name": "Zlib Decompressor",
     "version": "1.0.0",
     "manifest_version": 3,
+    "action": {
+      "default_popup": "index.html"
+    },
     "content_scripts": [
       {
         "matches": ["<all_urls>"],
@@ -9,9 +12,5 @@
           "content.js"
         ]
       }
-    ],
-    "background": {
-      "scripts": ["background.js"],
-      "persistent": false
-    }
+    ]
   }
