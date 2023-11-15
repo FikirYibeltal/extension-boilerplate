@@ -20,7 +20,12 @@ const decompress = (compressedData: any) => {
   return result;
 };
 
-const updateOnAccordion = (document: any, allNativePayloads: any[],type:any) => {
+const updateOnAccordion = (
+  document: any,
+  allNativePayloads: any[],
+  type: any,
+  setIsCopied: any
+) => {
   const trElements = document.querySelectorAll(
     `tr[data-test-subj="tableDocViewRow-${type}"]`
   );
@@ -35,12 +40,31 @@ const updateOnAccordion = (document: any, allNativePayloads: any[],type:any) => 
       const decompressedNode = document.createElement("p");
       decompressedNode.textContent = decompressed;
       decompressedNode.style.backgroundColor = "#e6f0f8";
-      decompressedNode.setAttribute('class', 'zlib-decompressed-text');
+      decompressedNode.style.cursor = "pointer";
+      decompressedNode.setAttribute("class", "zlib-decompressed-text");
+      decompressedNode.onclick = function () {
+        navigator.clipboard.writeText(decompressed);
+        setIsCopied(true);
+        const copiedDiv=document.createElement('div');
+        copiedDiv.classList.add('copy-text-wrapper');
+        const copyText=document.createElement('p');
+        copyText.classList.add('copy-text');
+        copiedDiv.appendChild(copyText)
+        document.querySelector('body')?.appendChild(copiedDiv);
+        setTimeout(()=>{
+          document.body.querySelector('div.copy-text-wrapper')?.remove();
+        },3000)
+      };
       divElement.insertBefore(decompressedNode, divElement.firstChild);
     }
   });
 };
-const updateOnTable = (document: Document, allNativePayloads: any[], type: any) => {
+const updateOnTable = (
+  document: Document,
+  allNativePayloads: any[],
+  type: any,
+  setIsCopied: any
+) => {
   const thElements = document.querySelectorAll(
     'th[data-test-subj="docTableHeaderField"]'
   );
@@ -55,7 +79,10 @@ const updateOnTable = (document: Document, allNativePayloads: any[], type: any) 
         const localTRElements = tBody.querySelectorAll("tr");
         localTRElements.forEach((trElement, trIndex) => {
           const tdElements = trElement.querySelectorAll("td");
-          if (tdElements[index + 1]) {
+          const isAccordionData = trElement.classList.contains(
+            "kbnDocTableDetails__row"
+          );
+          if (tdElements[index + 1] && !isAccordionData) {
             const wrapper = tdElements[index + 1].querySelector("div");
             const exisitingDecompressedNode = !!wrapper?.querySelector("p");
             if (wrapper && !exisitingDecompressedNode) {
@@ -66,7 +93,23 @@ const updateOnTable = (document: Document, allNativePayloads: any[], type: any) 
               const decompressedNode = document.createElement("p");
               decompressedNode.textContent = decompressed;
               decompressedNode.style.backgroundColor = "#e6f0f8";
-              decompressedNode.setAttribute('class', 'zlib-decompressed-text');
+              decompressedNode.style.cursor = "pointer";
+              decompressedNode.setAttribute("class", "zlib-decompressed-text");
+              decompressedNode.onclick = function () {
+                navigator.clipboard.writeText(decompressed);
+                setIsCopied(true);
+                const copiedDiv=document.createElement('div');
+                copiedDiv.classList.add('copy-text-wrapper');
+                const copyText=document.createElement('p');
+                copyText.textContent="Copied!";
+                copyText.classList.add('copy-text');
+                copiedDiv.appendChild(copyText)
+                document.querySelector('body')?.appendChild(copiedDiv);
+                setTimeout(()=>{
+                  document.body.querySelector('div.copy-text-wrapper')?.remove();
+                },3000)
+
+              };
               wrapper.insertBefore(decompressedNode, wrapper.firstChild);
             }
           }
@@ -77,36 +120,40 @@ const updateOnTable = (document: Document, allNativePayloads: any[], type: any) 
 };
 function App() {
   const [nativePayloads, setNativePayloads] = useState([]);
+  const [isCopied, setIsCopied]=useState(false);
 
   const handleUpdate = () => {
     if (localStorage.getItem("decompress") === "true") {
       const allNativePayloads: any = [];
-      updateOnAccordion(document, allNativePayloads,'nativePayload');
-      updateOnTable(document, allNativePayloads,'nativePayload');
-      updateOnAccordion(document, allNativePayloads,'responsePayload');
-      updateOnTable(document, allNativePayloads,'responsePayload');
+      updateOnAccordion(document, allNativePayloads, "nativePayload",setIsCopied);
+      updateOnTable(document, allNativePayloads, "nativePayload",setIsCopied);
+      updateOnAccordion(document, allNativePayloads, "responsePayload",setIsCopied);
+      updateOnTable(document, allNativePayloads, "responsePayload",setIsCopied);
       setNativePayloads(allNativePayloads);
     }
   };
   useEffect(() => {
-    
     window.addEventListener("scroll", handleUpdate);
 
     return () => {
       window.removeEventListener("scroll", handleUpdate);
     };
   }, []);
-
+  useEffect(()=>{
+    console.log(isCopied);
+  },[isCopied]);
   useEffect(() => {
-    const handleMessage = (message:any, sender: any, sendResponse: any) => {
-      if (message.action === 'setLocalStorage') {
+    const handleMessage = (message: any, sender: any, sendResponse: any) => {
+      if (message.action === "setLocalStorage") {
         const { key, value } = message.data;
         localStorage.setItem(key, value);
-        if(value==='true') handleUpdate()
-      }else if(message.action==='clear'){
-        localStorage.setItem('decompress','false');
-        const paragraphsToRemove = document.querySelectorAll('p.zlib-decompressed-text');
-        paragraphsToRemove.forEach(paragraph => {
+        if (value === "true") handleUpdate();
+      } else if (message.action === "clear") {
+        localStorage.setItem("decompress", "false");
+        const paragraphsToRemove = document.querySelectorAll(
+          "p.zlib-decompressed-text"
+        );
+        paragraphsToRemove.forEach((paragraph) => {
           paragraph.remove();
         });
       }
@@ -119,8 +166,8 @@ function App() {
     };
   }, []);
   return (
-    <div className="wrapper">
-      <header className="App-header">testing</header>
+    <div>
+      
     </div>
   );
 }

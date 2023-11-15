@@ -1,7 +1,29 @@
-.wrapper{
-    width: 10rem;
-    height: 10rem;
-    background-color: black;
+.copy-text-wrapper{
+    z-index: 100;
     top:0;
     left:0;
+    width:100%;
+    position: fixed;
+    padding-top: 1.5rem;
+    text-align: center;
+    font-size: large;
+    
 }
+.copy-text{
+    background-color: green;
+    padding: 0.7rem 1.5rem;
+    border-radius: .2rem;
+    animation: fadeInOut 1s ease-in;
+    display: inline-block;
+    color: white;
+}
+
+
+@keyframes fadeInOut {
+    0%, 100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
