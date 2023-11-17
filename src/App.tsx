@@ -49,6 +49,7 @@ const updateOnAccordion = (
         copiedDiv.classList.add('copy-text-wrapper');
         const copyText=document.createElement('p');
         copyText.classList.add('copy-text');
+        copyText.textContent="Copied!";
         copiedDiv.appendChild(copyText)
         document.querySelector('body')?.appendChild(copiedDiv);
         setTimeout(()=>{
