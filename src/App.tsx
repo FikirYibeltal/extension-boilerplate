@@ -35,7 +35,11 @@ const updateOnAccordion = (
     if (divElement && !exisitingDecompressedNode) {
       const spanElement =
         divElement.querySelector("span")?.firstChild?.nodeValue;
-      const decompressed = decompress(spanElement);
+      let text=spanElement;
+      if(typeof  spanElement !== 'string'){
+        text=divElement.querySelector("span").querySelector("mark")?.firstChild?.nodeValue;
+      }
+      const decompressed = decompress(text);
       allNativePayloads.push(decompressed);
       const decompressedNode = document.createElement("p");
       decompressedNode.textContent = decompressed;
@@ -89,7 +93,11 @@ const updateOnTable = (
             if (wrapper && !exisitingDecompressedNode) {
               const value =
                 wrapper.querySelector("span")?.firstChild?.nodeValue;
-              const decompressed = decompress(value);
+                let text=value;
+                if(typeof  value !== 'string'){
+                  text=wrapper.querySelector("span")?.querySelector("mark")?.firstChild?.nodeValue;
+                }
+              const decompressed = decompress(text);
               allNativePayloads.push(decompressed);
               const decompressedNode = document.createElement("p");
               decompressedNode.textContent = decompressed;
