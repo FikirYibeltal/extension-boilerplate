@@ -14,7 +14,7 @@ const decompress = (compressedData: any) => {
     result = pako.inflate(uint8Array, { to: "string" });
   } catch (err: any) {
     console.error("zlib decompress error:", err);
-    result = compressedData;
+    // result = compressedData;
   }
 
   return result;
@@ -35,32 +35,35 @@ const updateOnAccordion = (
     if (divElement && !exisitingDecompressedNode) {
       const spanElement =
         divElement.querySelector("span")?.firstChild?.nodeValue;
-      let text=spanElement;
-      if(typeof  spanElement !== 'string'){
-        text=divElement.querySelector("span").querySelector("mark")?.firstChild?.nodeValue;
+      let text = spanElement;
+      if (typeof spanElement !== "string") {
+        text = divElement.querySelector("span").querySelector("mark")
+          ?.firstChild?.nodeValue;
       }
       const decompressed = decompress(text);
-      allNativePayloads.push(decompressed);
-      const decompressedNode = document.createElement("p");
-      decompressedNode.textContent = decompressed;
-      decompressedNode.style.backgroundColor = "#e6f0f8";
-      decompressedNode.style.cursor = "pointer";
-      decompressedNode.setAttribute("class", "zlib-decompressed-text");
-      decompressedNode.onclick = function () {
-        navigator.clipboard.writeText(decompressed);
-        setIsCopied(true);
-        const copiedDiv=document.createElement('div');
-        copiedDiv.classList.add('copy-text-wrapper');
-        const copyText=document.createElement('p');
-        copyText.classList.add('copy-text');
-        copyText.textContent="Copied!";
-        copiedDiv.appendChild(copyText)
-        document.querySelector('body')?.appendChild(copiedDiv);
-        setTimeout(()=>{
-          document.body.querySelector('div.copy-text-wrapper')?.remove();
-        },3000)
-      };
-      divElement.insertBefore(decompressedNode, divElement.firstChild);
+      if (decompressed) {
+        allNativePayloads.push(decompressed);
+        const decompressedNode = document.createElement("p");
+        decompressedNode.textContent = decompressed;
+        decompressedNode.style.backgroundColor = "#e6f0f8";
+        decompressedNode.style.cursor = "pointer";
+        decompressedNode.setAttribute("class", "zlib-decompressed-text");
+        decompressedNode.onclick = function () {
+          navigator.clipboard.writeText(decompressed);
+          setIsCopied(true);
+          const copiedDiv = document.createElement("div");
+          copiedDiv.classList.add("copy-text-wrapper");
+          const copyText = document.createElement("p");
+          copyText.classList.add("copy-text");
+          copyText.textContent = "Copied!";
+          copiedDiv.appendChild(copyText);
+          document.querySelector("body")?.appendChild(copiedDiv);
+          setTimeout(() => {
+            document.body.querySelector("div.copy-text-wrapper")?.remove();
+          }, 3000);
+        };
+        divElement.insertBefore(decompressedNode, divElement.firstChild);
+      }
     }
   });
 };
@@ -93,10 +96,11 @@ const updateOnTable = (
             if (wrapper && !exisitingDecompressedNode) {
               const value =
                 wrapper.querySelector("span")?.firstChild?.nodeValue;
-                let text=value;
-                if(typeof  value !== 'string'){
-                  text=wrapper.querySelector("span")?.querySelector("mark")?.firstChild?.nodeValue;
-                }
+              let text = value;
+              if (typeof value !== "string") {
+                text = wrapper.querySelector("span")?.querySelector("mark")
+                  ?.firstChild?.nodeValue;
+              }
               const decompressed = decompress(text);
               allNativePayloads.push(decompressed);
               const decompressedNode = document.createElement("p");
@@ -107,17 +111,18 @@ const updateOnTable = (
               decompressedNode.onclick = function () {
                 navigator.clipboard.writeText(decompressed);
                 setIsCopied(true);
-                const copiedDiv=document.createElement('div');
-                copiedDiv.classList.add('copy-text-wrapper');
-                const copyText=document.createElement('p');
-                copyText.textContent="Copied!";
-                copyText.classList.add('copy-text');
-                copiedDiv.appendChild(copyText)
-                document.querySelector('body')?.appendChild(copiedDiv);
-                setTimeout(()=>{
-                  document.body.querySelector('div.copy-text-wrapper')?.remove();
-                },3000)
-
+                const copiedDiv = document.createElement("div");
+                copiedDiv.classList.add("copy-text-wrapper");
+                const copyText = document.createElement("p");
+                copyText.textContent = "Copied!";
+                copyText.classList.add("copy-text");
+                copiedDiv.appendChild(copyText);
+                document.querySelector("body")?.appendChild(copiedDiv);
+                setTimeout(() => {
+                  document.body
+                    .querySelector("div.copy-text-wrapper")
+                    ?.remove();
+                }, 3000);
               };
               wrapper.insertBefore(decompressedNode, wrapper.firstChild);
             }
@@ -129,15 +134,30 @@ const updateOnTable = (
 };
 function App() {
   const [nativePayloads, setNativePayloads] = useState([]);
-  const [isCopied, setIsCopied]=useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   const handleUpdate = () => {
     if (localStorage.getItem("decompress") === "true") {
       const allNativePayloads: any = [];
-      updateOnAccordion(document, allNativePayloads, "nativePayload",setIsCopied);
-      updateOnTable(document, allNativePayloads, "nativePayload",setIsCopied);
-      updateOnAccordion(document, allNativePayloads, "responsePayload",setIsCopied);
-      updateOnTable(document, allNativePayloads, "responsePayload",setIsCopied);
+      updateOnAccordion(
+        document,
+        allNativePayloads,
+        "nativePayload",
+        setIsCopied
+      );
+      updateOnTable(document, allNativePayloads, "nativePayload", setIsCopied);
+      updateOnAccordion(
+        document,
+        allNativePayloads,
+        "responsePayload",
+        setIsCopied
+      );
+      updateOnTable(
+        document,
+        allNativePayloads,
+        "responsePayload",
+        setIsCopied
+      );
       setNativePayloads(allNativePayloads);
     }
   };
@@ -148,9 +168,9 @@ function App() {
       window.removeEventListener("scroll", handleUpdate);
     };
   }, []);
-  useEffect(()=>{
+  useEffect(() => {
     console.log(isCopied);
-  },[isCopied]);
+  }, [isCopied]);
   useEffect(() => {
     const handleMessage = (message: any, sender: any, sendResponse: any) => {
       if (message.action === "setLocalStorage") {
@@ -174,11 +194,7 @@ function App() {
       chrome.runtime.onMessage.removeListener(handleMessage);
     };
   }, []);
-  return (
-    <div>
-      
-    </div>
-  );
+  return <div></div>;
 }
 
 export default App;
